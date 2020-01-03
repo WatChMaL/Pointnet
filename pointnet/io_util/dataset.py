@@ -12,7 +12,7 @@ class WChPointnetDataset(Dataset):
         path: location of hdf5 file
         cols_to_include: list containing index numbers of which columns to use. 
         """
-        self.cols_to_include
+        self.cols_to_include = cols_to_include
 
         f = h5py.File(path, 'r')
         hdf5_event_data = f["event_data"]
