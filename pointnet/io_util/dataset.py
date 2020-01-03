@@ -40,7 +40,7 @@ class WChPointnetDataset(Dataset):
         return self.labels.shape[0]
 
 
-class WChPointnetDataset_trainval(WCH5Dataset):
+class WChPointnetDataset_trainval(WChPointnetDataset):
 
     def __init__(self, path, cols_to_include, indices_file):
 
