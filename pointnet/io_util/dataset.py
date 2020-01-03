@@ -6,21 +6,21 @@ from torch.utils.data import Dataset, DataLoader
 
 class WChPointnetDataset(Dataset):
 
-	def __init__(self, path, cols_to_include):
-		"""
-		Pointnet dataset object for WatChMaL data.
-		path: location of hdf5 file
-		cols_to_include: list containing index numbers of which columns to use. 
-		"""
-		self.cols_to_include
+    def __init__(self, path, cols_to_include):
+        """
+        Pointnet dataset object for WatChMaL data.
+        path: location of hdf5 file
+        cols_to_include: list containing index numbers of which columns to use. 
+        """
+        self.cols_to_include
 
-		f = h5py.File(path, 'r')
-		hdf5_event_data = f["event_data"]
-		hdf5_labels = f["labels"]
+        f = h5py.File(path, 'r')
+        hdf5_event_data = f["event_data"]
+        hdf5_labels = f["labels"]
 
-		assert hdf5_event_data.shape[0] == hdf5_labels.shape[0]
+        assert hdf5_event_data.shape[0] == hdf5_labels.shape[0]
 
-		event_data_shape = hdf5_event_data.shape
+        event_data_shape = hdf5_event_data.shape
         event_data_offset = hdf5_event_data.id.get_offset()
         event_data_dtype = hdf5_event_data.dtype
 
@@ -31,13 +31,13 @@ class WChPointnetDataset(Dataset):
         self.labels = np.array(hdf5_labels)
 
     def get(self, idx):
-    	x = torch.from_numpy(self.point_clouds[idx][:, self.cols_to_include])
-    	y = torch.tensor([self.labels[idx]], dtype=torch.int64)
+        x = torch.from_numpy(self.point_clouds[idx][:, self.cols_to_include])
+        y = torch.tensor([self.labels[idx]], dtype=torch.int64)
 
-    	return x, y
+        return x, y
 
-   	def __len__(self):
-   		return self.labels.shape[0]
+    def __len__(self):
+        return self.labels.shape[0]
 
 
 class WChPointnetDataset_trainval(WCH5Dataset):
