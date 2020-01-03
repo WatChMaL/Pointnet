@@ -40,14 +40,6 @@ class WChPointnetDataset(Dataset):
         return self.labels.shape[0]
 
 
-class WChPointnetDataset_trainval(WChPointnetDataset):
 
-    def __init__(self, path, cols_to_include, indices_file):
-
-        super(WChPointnetDataset_trainval, self).__init__(path, cols_to_include)
-
-        all_indices = np.load(indices_file)
-
-        self.train_indices = all_indices["train_idxs"]
-        self.val_indices = all_indices["val_idxs"]
+        
 
