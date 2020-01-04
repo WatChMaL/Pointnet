@@ -1,6 +1,6 @@
 from torch.utils.data.sampler import SubsetRandomSampler
 from torch.utils.data import DataLoader
-from io_util.dataset import WChPointnetDataset, WChPointnetDataset_trainval
+from io_util.dataset import WChPointnetDataset
 import numpy as np 
 
 def get_loaders(path, cols_to_include, indices_file, batch_size, workers):

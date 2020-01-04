@@ -30,7 +30,7 @@ class WChPointnetDataset(Dataset):
                                     offset=event_data_offset, dtype=event_data_dtype)
         self.labels = np.array(hdf5_labels)
 
-    def get(self, idx):
+    def __getitem__(self, idx):
         x = torch.from_numpy(self.point_clouds[idx][:, self.cols_to_include])
         y = torch.tensor([self.labels[idx]], dtype=torch.int64)
 
