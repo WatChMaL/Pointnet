@@ -21,7 +21,7 @@ class EnginePointnet(Engine):
 
     def __init__(self, model, config):
         super().__init__(model, config)
-        self.criterion=F.nll_loss
+        self.criterion=torch.nn.CrossEntropyLoss()
         self.optimizer=select_optimizer(config.optimizer, self.model_accs.parameters(),
                         **config.optimizer_kwargs)
         self.scheduler = ReduceLROnPlateau(self.optimizer, **config.scheduler_kwargs)
@@ -83,10 +83,11 @@ class EnginePointnet(Engine):
                 res=self.forward(data, mode="train")
 
                 # Do a backward pass
-                loss = self.backward(res, label.view(-1))
+                loss = self.backward(res, label)
 
                 # Calculate metrics
-                acc = res.argmax(1).eq(label).sum().item()/label.shape[0]
+                predlabel = torch.argmax(res, dim=1)
+                acc = torch.mean((predlabel == label.view(-1)).float())
 
                 # Record the metrics for the mini-batch in the log
                 self.train_log.record(self.keys, [iteration, epoch, loss, acc])
