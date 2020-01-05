@@ -83,7 +83,7 @@ class EnginePointnet(Engine):
                 res=self.forward(data, mode="train")
 
                 # Do a backward pass
-                loss = self.backward(res, label)
+                loss = self.backward(res, label.view(-1))
 
                 # Calculate metrics
                 predlabel = torch.argmax(res, dim=1)
