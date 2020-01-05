@@ -10,7 +10,7 @@ config.model_kwargs = {"in_channels": len(config.cols_to_use),
 config.data_path = "/data/WatChMaL/data/pointnet/splits/pointnet_trainval.h5"
 config.indices_file = "/data/WatChMaL/data/pointnet/splits/pointnet_trainval_idxs.npz"
 
-config.dump_path = "/home/dgreen/training_outputs"
+config.dump_path = "/home/dgreen/training_outputs/"
 
 config.num_data_workers = 0 # Sometime crashes if we do multiprocessing
 config.device = 'gpu'

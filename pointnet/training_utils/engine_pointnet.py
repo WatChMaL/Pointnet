@@ -83,10 +83,10 @@ class EnginePointnet(Engine):
                 res=self.forward(data, mode="train")
 
                 # Do a backward pass
-                loss = self.backward(res, label)
+                loss = self.backward(res, label.view(-1))
 
                 # Calculate metrics
-                acc = res.argmax(1).eq(data.y).sum().item()/label.shape[0]
+                acc = res.argmax(1).eq(label).sum().item()/label.shape[0]
 
                 # Record the metrics for the mini-batch in the log
                 self.train_log.record(self.keys, [iteration, epoch, loss, acc])
