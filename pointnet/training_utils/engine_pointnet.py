@@ -72,8 +72,8 @@ class EnginePointnet(Engine):
                   'Starting @', strftime("%Y-%m-%d %H:%M:%S", localtime()))
 
             # Local training loop for a single epoch
-            for data in self.train_loader:
-                data = data.to(self.device)
+            for batch in self.train_loader:
+                data, label = batch[0].to(self.device), batch[1].to(self.device)
 
                 # Update the epoch and iteration
                 epoch+=1. / len(self.train_loader)
@@ -83,10 +83,10 @@ class EnginePointnet(Engine):
                 res=self.forward(data, mode="train")
 
                 # Do a backward pass
-                loss = self.backward(res, data.y)
+                loss = self.backward(res, label)
 
                 # Calculate metrics
-                acc = res.argmax(1).eq(data.y).sum().item()/data.y.shape[0]
+                acc = res.argmax(1).eq(data.y).sum().item()/label.shape[0]
 
                 # Record the metrics for the mini-batch in the log
                 self.train_log.record(self.keys, [iteration, epoch, loss, acc])
