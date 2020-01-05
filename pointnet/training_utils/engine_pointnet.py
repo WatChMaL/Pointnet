@@ -105,17 +105,18 @@ class EnginePointnet(Engine):
                     with torch.no_grad():
                         for val_batch in range(num_val_batches):
                             try:
-                                data=next(val_iter)
+                                val_data=next(val_iter)
                             except StopIteration:
                                 val_iter=iter(self.val_loader)
-                                data=next(val_iter)
-                            data = data.to(self.device)
+                                val_data=next(val_iter)
+                            data, label = val_data[0].to(self.device), val_data[1].to(self.device)
 
                             # Extract the event data from the input data tuple
                             res=self.forward(data, mode="validation")
-                            acc = res.argmax(1).eq(data.y).sum().item()/data.y.shape[0]
+                            predlabel = torch.argmax(res, dim=1)
+                            acc = torch.mean((predlabel == label.view(-1)).float())
 
-                            val_loss+=self.criterion(res, data.y)
+                            val_loss+=self.criterion(res, label.view(-1))
                             val_acc+=acc
 
                     val_loss /= num_val_batches
