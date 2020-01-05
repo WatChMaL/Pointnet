@@ -12,7 +12,7 @@ from config.config_triumf import config
 
 if __name__ -- '__main__':
     # Initialization
-	model = Pointnet(**config.model_kwargs) 
+    model = Pointnet(**config.model_kwargs) 
     engine = EnginePointnet(model, config)
 
     # Training
