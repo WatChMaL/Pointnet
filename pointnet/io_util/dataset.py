@@ -2,11 +2,11 @@ import torch
 import h5py
 import numpy as np
 
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 
 class WChPointnetDataset(Dataset):
 
-    def __init__(self, path, cols_to_include, device=None):
+    def __init__(self, path, cols_to_include):
         """
         Pointnet dataset object for WatChMaL data.
         path: location of hdf5 file
@@ -14,7 +14,6 @@ class WChPointnetDataset(Dataset):
         """
         
         self.cols_to_include = cols_to_include
-        self.device = device
 
         f = h5py.File(path, 'r')
         hdf5_event_data = f["event_data"]
@@ -36,9 +35,7 @@ class WChPointnetDataset(Dataset):
         x = torch.from_numpy(self.point_clouds[idx][:, self.cols_to_include])
         y = torch.tensor([self.labels[idx]], dtype=torch.int64)
         
-        
-        # change this later
-        return x.to(self.device), y.to(self.device)
+        return x, y
 
     def __len__(self):
         return self.labels.shape[0]

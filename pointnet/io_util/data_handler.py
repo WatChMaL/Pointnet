@@ -3,11 +3,9 @@ from torch.utils.data import DataLoader
 from pointnet.io_util.dataset import WChPointnetDataset
 import numpy as np 
 
-def get_loaders(path, cols_to_include, indices_file, batch_size, workers, device=None):
+def get_loaders(path, cols_to_include, indices_file, batch_size, workers):
     
-    print("in get loaders")
-    print(device)
-    dataset = WChPointnetDataset(path, cols_to_include, device=device)
+    dataset = WChPointnetDataset(path, cols_to_include)
 
     all_indices = np.load(indices_file)
     train_indices = all_indices["train_idxs"]
@@ -16,10 +14,10 @@ def get_loaders(path, cols_to_include, indices_file, batch_size, workers, device
 
     # change pin_memory back to true
     train_loader = DataLoader(dataset, batch_size=batch_size, num_workers=workers,
-                              pin_memory=False, sampler=SubsetRandomSampler(train_indices))
+                              pin_memory=True, sampler=SubsetRandomSampler(train_indices))
 
     val_loader = DataLoader(dataset, batch_size=batch_size, num_workers=workers,
-                              pin_memory=False, sampler=SubsetRandomSampler(val_indices))
+                              pin_memory=True, sampler=SubsetRandomSampler(val_indices))
 
     
     return train_loader, val_loader, dataset
