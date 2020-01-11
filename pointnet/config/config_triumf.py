@@ -2,11 +2,12 @@ from config.easy_dict import EasyDict
 
 config = EasyDict()
 
+config.model_name = "Pointnet"
+
 config.cols_to_use = [0,1,2,3]
 # may want to change: feat_size, layer_dims, etc. 
 config.model_kwargs = {"in_channels": len(config.cols_to_use), 
 					   "num_classes": 3}
-
 config.data_path = "/data/WatChMaL/data/pointnet/splits/pointnet_trainval.h5"
 config.indices_file = "/data/WatChMaL/data/pointnet/splits/pointnet_trainval_idxs.npz"
 
