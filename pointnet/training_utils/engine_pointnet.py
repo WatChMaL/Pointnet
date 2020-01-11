@@ -80,13 +80,13 @@ class EnginePointnet(Engine):
                 iteration += 1
 
                 # Do a forward pass
-                res=self.forward(data, mode="train")
+                pred = self.forward(data, mode="train")
 
                 # Do a backward pass
-                loss = self.backward(res, label.view(-1))
+                loss = self.backward(pred, label.view(-1))
 
                 # Calculate metrics
-                predlabel = torch.argmax(res, dim=1)
+                predlabel = torch.argmax(pred, dim=1)
                 acc = torch.mean((predlabel == label.view(-1)).float())
 
                 # Record the metrics for the mini-batch in the log
@@ -112,12 +112,12 @@ class EnginePointnet(Engine):
                             data, label = val_data[0].to(self.device), val_data[1].to(self.device)
 
                             # Extract the event data from the input data tuple
-                            res=self.forward(data, mode="validation")
-                            predlabel = torch.argmax(res, dim=1)
+                            pred = self.forward(data, mode="validation")
+                            predlabel = torch.argmax(pred, dim=1)
                             acc = torch.mean((predlabel == label.view(-1)).float())
-
-                            val_loss+=self.criterion(res, label.view(-1))
-                            val_acc+=acc
+                            loss = self.criterion(pred, label.view(-1))
+                            val_loss += loss.item()
+                            val_acc += acc.detach().cpu().item()
 
                     val_loss /= num_val_batches
                     val_acc /= num_val_batches
@@ -187,23 +187,23 @@ class EnginePointnet(Engine):
         dump_index = 0
 
         with torch.no_grad():
-            for iteration, data in enumerate(data_iter):
-                gpu_data = data.to(self.device)
+            for iteration, batch in enumerate(data_iter):
+                data, label = batch[0].to(self.device), batch[1].to(self.device)
 
                 stdout.write("Iteration : {}, Progress {} \n".format(iteration, iteration/len(data_iter)))
-                res=self.forward(gpu_data, mode="validation")
+                pred=self.forward(data, mode="validation")
 
-                acc = res.argmax(1).eq(gpu_data.y).sum().item()
-                loss = self.criterion(res, gpu_data.y) * data.y.shape[0]
+                acc = pred.argmax(1).eq(label).sum().item()
+                loss = self.criterion(pred, label.view(-1)) * label.shape[0]
                 avg_acc += acc
                 avg_loss += loss
 
                 # Log/Report
-                self.log.record(["Iteration", "loss", "acc"], [iteration, loss, acc/data.y.shape[0]])
+                self.log.record(["Iteration", "loss", "acc"], [iteration, loss, acc/label.shape[0]])
                 self.log.write()
 
                 # Log/Report
-                for label, pred, preds in zip(data.y.tolist(), res.argmax(1).tolist(), res.exp().tolist()):
+                for label, pred, preds in zip(label.tolist(), pred.argmax(1).tolist(), pred.exp().tolist()):
                     key_val["index"].append(next(indices_iter))
                     key_val["label"].append(label)
                     key_val["pred"].append(pred)

@@ -27,7 +27,7 @@ config.batch_size = 32
 config.epochs = 10
 
 config.report_interval = 50
-config.num_val_batches  = 32
+config.num_val_batches  = 128
 config.valid_interval   = 200
 
 config.validate_batch_size = 32
