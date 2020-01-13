@@ -26,6 +26,7 @@ class EnginePointnet(Engine):
                         **config.optimizer_kwargs)
         self.scheduler = ReduceLROnPlateau(self.optimizer, **config.scheduler_kwargs)
         self.keys = ['iteration', 'epoch', 'loss', 'acc']
+        print(type(self.optimizer))
 
     def forward(self, data, mode="train"):
         """Overrides the forward abstract method in Engine.py.
@@ -72,7 +73,7 @@ class EnginePointnet(Engine):
                   'Starting @', strftime("%Y-%m-%d %H:%M:%S", localtime()))
 
             # Local training loop for a single epoch
-            for batch in self.train_loader:
+            for idx, batch in enumerate(self.train_loader):
                 data, label = batch[0].to(self.device), batch[1].to(self.device)
 
                 # Update the epoch and iteration
@@ -92,6 +93,9 @@ class EnginePointnet(Engine):
                 # Record the metrics for the mini-batch in the log
                 self.train_log.record(self.keys, [iteration, epoch, loss, acc])
                 self.train_log.write()
+                
+                if idx == 1000:
+                    break
 
                 # Print the metrics at report_intervals
                 if iteration % report_interval == 0:
@@ -100,6 +104,7 @@ class EnginePointnet(Engine):
 
                 # Run validation on valid_intervals
                 if iteration % valid_interval == 0:
+                    print("Validating...")
                     val_loss=0.
                     val_acc=0.
                     with torch.no_grad():
@@ -121,9 +126,10 @@ class EnginePointnet(Engine):
 
                     val_loss /= num_val_batches
                     val_acc /= num_val_batches
-                    if iteration > next_scheduler:
-                        self.scheduler.step(val_loss)
-                        next_scheduler += scheduler_step
+                    if self.config.use_scheduler:
+                        if iteration > next_scheduler:
+                            self.scheduler.step(val_loss)
+                            next_scheduler += scheduler_step
 
 
                     # Record the validation stats to the csv
@@ -138,8 +144,11 @@ class EnginePointnet(Engine):
 
                     # Save the latest model
                     self.save_state(mode="latest")
+                    print("... Current Validation Loss %1.3f ... Best Validation Loss %1.3f"
+                          % (val_loss, best_val_loss))
 
             self.save_state(mode="latest", name="epoch_{}".format(np.round(epoch).astype(np.int)))
+            break
 
         self.val_log.close()
         self.train_log.close()
