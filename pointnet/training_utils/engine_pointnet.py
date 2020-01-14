@@ -72,12 +72,10 @@ class EnginePointnet(Engine):
             print('Epoch', np.round(epoch).astype(np.int),
                   'Starting @', strftime("%Y-%m-%d %H:%M:%S", localtime()))
             train_iter = iter(self.train_loader)
-            batch = next(train_iter)
-            data, label = batch[0].to(self.device), batch[1].to(self.device)
+            
             # Local training loop for a single epoch
-            for i in range(10000):
-            #for idx, batch in enumerate(self.train_loader):
-                #data, label = batch[0].to(self.device), batch[1].to(self.device)
+            for idx, batch in enumerate(self.train_loader):
+                data, label = batch
 
                 # Update the epoch and iteration
                 epoch+=1. / len(self.train_loader)
@@ -114,7 +112,7 @@ class EnginePointnet(Engine):
                             except StopIteration:
                                 val_iter=iter(self.val_loader)
                                 val_data=next(val_iter)
-                            data, label = val_data[0].to(self.device), val_data[1].to(self.device)
+                            data, label = val_data
 
                             # Extract the event data from the input data tuple
                             pred = self.forward(data, mode="validation")
@@ -148,7 +146,6 @@ class EnginePointnet(Engine):
                           % (val_loss, best_val_loss))
 
             self.save_state(mode="latest", name="epoch_{}".format(np.round(epoch).astype(np.int)))
-            break
 
         self.val_log.close()
         self.train_log.close()
@@ -197,7 +194,7 @@ class EnginePointnet(Engine):
 
         with torch.no_grad():
             for iteration, batch in enumerate(data_iter):
-                data, label = batch[0].to(self.device), batch[1].to(self.device)
+                data, label = batch
 
                 stdout.write("Iteration : {}, Progress {} \n".format(iteration, iteration/len(data_iter)))
                 pred=self.forward(data, mode="validation")

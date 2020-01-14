@@ -8,7 +8,7 @@ from torch import device, load, save
 from torch.nn import DataParallel
 from torch.cuda import is_available
 
-from io_util.data_handler import get_loaders
+from io_util.data_handler_kn_with_time import get_loaders
 from training_utils.logger import CSVData
 
 class Engine(ABC):
@@ -21,16 +21,9 @@ class Engine(ABC):
         self.config=config
 
         # Determine the device to be used for model training and inference
-        if (config.device == 'gpu') and config.gpu_list:
-            print("Requesting GPUs. GPU list : " + str(config.gpu_list))
-            self.devids=["cuda:{0}".format(x) for x in config.gpu_list]
-            print("Main GPU : " + self.devids[0])
-
+        if (config.device != 'cpu'):
             if is_available():
-                self.device=device(self.devids[0])
-                if len(self.devids) > 1:
-                    print("Using DataParallel on these devices: {}".format(self.devids))
-                    self.model=DataParallel(self.model, device_ids=config.gpu_list, dim=0)
+                self.device=device(config.device)
                 print("CUDA is available")
             else:
                 self.device=device("cpu")
@@ -40,18 +33,14 @@ class Engine(ABC):
             self.device=device("cpu")
 
         # Send the model to the selected device
-        self.model = DataParallel(self.model) if len(self.devids) > 1 else self.model # Changed
         self.model.to(self.device)
 
-        # Setup the parameters tp save given the model type
-        if type(self.model) == DataParallel:
-            self.model_accs=self.model.module
-        else:
-            self.model_accs=self.model
+        # Setup the parameters to save given the model type
+        self.model_accs=self.model
 
         # Create the dataset object
         out = get_loaders(config.data_path, config.cols_to_use, config.indices_file,
-                          config.batch_size, config.num_data_workers)
+                          config.batch_size, config.num_data_workers, self.device)
 
         self.train_loader, self.val_loader, self.dataset = out
 
