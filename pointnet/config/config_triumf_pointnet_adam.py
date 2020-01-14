@@ -16,7 +16,7 @@ config.dump_path = "/home/dgreen/training_outputs/pointnet/no_time/adam/"
 
 config.num_data_workers = 0 # Sometime crashes if we do multiprocessing
 config.device = 'gpu'
-config.gpu_list = [6]
+config.gpu_list = [5]
 
 config.optimizer = "Adam"
 config.optimizer_kwargs = {"lr":1e-3, "betas": (0.9, 0.999)}

@@ -71,10 +71,13 @@ class EnginePointnet(Engine):
 
             print('Epoch', np.round(epoch).astype(np.int),
                   'Starting @', strftime("%Y-%m-%d %H:%M:%S", localtime()))
-
+            train_iter = iter(self.train_loader)
+            batch = next(train_iter)
+            data, label = batch[0].to(self.device), batch[1].to(self.device)
             # Local training loop for a single epoch
-            for idx, batch in enumerate(self.train_loader):
-                data, label = batch[0].to(self.device), batch[1].to(self.device)
+            for i in range(10000):
+            #for idx, batch in enumerate(self.train_loader):
+                #data, label = batch[0].to(self.device), batch[1].to(self.device)
 
                 # Update the epoch and iteration
                 epoch+=1. / len(self.train_loader)
@@ -93,9 +96,6 @@ class EnginePointnet(Engine):
                 # Record the metrics for the mini-batch in the log
                 self.train_log.record(self.keys, [iteration, epoch, loss, acc])
                 self.train_log.write()
-                
-                if idx == 1000:
-                    break
 
                 # Print the metrics at report_intervals
                 if iteration % report_interval == 0:
