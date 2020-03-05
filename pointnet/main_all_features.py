@@ -8,7 +8,7 @@ from training_utils.engine_pointnet import EnginePointnet
 from training_utils.find_top_models import find_top_models
 from kaolin.models.PointNet import PointNetClassifier as Pointnet
 
-from config.config_triumf_pointnet_adam import config
+from config.config_triumf_pointnet_adam_all_features import config
 
 if __name__ == '__main__':
     # Initialization

@@ -4,7 +4,7 @@ config = EasyDict()
 
 config.model_name = "Pointnet"
 
-config.cols_to_use = [0,1,2,3,4]
+config.cols_to_use = [0,1,2,3,4,5,6,7]
 # may want to change: feat_size, layer_dims, etc. 
 config.model_kwargs = {"in_channels": len(config.cols_to_use), 
 					   "num_classes": 3}
@@ -13,7 +13,7 @@ config.data_path = "/fast_scratch/WatChMaL/data/pointnet/pointnet_trainval.h5"
 config.indices_file = "/fast_scratch/WatChMaL/data/pointnet/pointnet_trainval_idxs.npz"
 
 #make sure to change this
-config.dump_path = "/home/dgreen/training_outputs/pointnet/time/adam/"
+config.dump_path = "/home/dgreen/training_outputs/pointnet/all_features/adam/"
 
 config.num_data_workers = 0 # Sometime crashes if we do multiprocessing
 config.device = 'cuda:7'
