@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 
 class WChPointnetDataset(Dataset):
 
-    def __init__(self, path, cols_to_include, device):
+    def __init__(self, path, cols_to_include, train_indices, val_indices, device):
         """
         Pointnet dataset object for WatChMaL data.
         path: location of hdf5 file
@@ -14,6 +14,8 @@ class WChPointnetDataset(Dataset):
         """
         
         self.cols_to_include = cols_to_include
+        self.train_indices = train_indices
+        self.val_indices = val_indices
         self.device = device
 
         f = h5py.File(path, 'r')

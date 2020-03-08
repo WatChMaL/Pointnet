@@ -5,11 +5,11 @@ import numpy as np
 
 def get_loaders(path, cols_to_include, indices_file, batch_size, workers, device):
     
-    dataset = WChPointnetDataset(path, cols_to_include, device=device)
-
     all_indices = np.load(indices_file)
     train_indices = all_indices["train_idxs"]
     val_indices = all_indices["val_idxs"]
+
+    dataset = WChPointnetDataset(path, cols_to_include, train_indices, val_indices, device=device)
 
 
     # change pin_memory back to true

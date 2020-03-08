@@ -15,7 +15,7 @@ config.indices_file = "/fast_scratch/WatChMaL/data/pointnet/pointnet_trainval_id
 config.dump_path = "/home/dgreen/training_outputs/pointnet/no_time/adam/"
 
 config.num_data_workers = 0 # Sometime crashes if we do multiprocessing
-config.device = 'cuda:6'
+config.device = 'cuda:7'
 
 config.optimizer = "Adam"
 config.optimizer_kwargs = {"lr":1e-3, "betas": (0.9, 0.999)}
