@@ -181,7 +181,7 @@ class EnginePointnet(Engine):
         os.makedirs(output_path)
         data_iter = DataLoader(self.dataset, batch_size=self.config.validate_batch_size,
                                num_workers=self.config.num_data_workers,
-                               pin_memory=True, sampler=SubsetSequentialSampler(validate_indices))
+                               pin_memory=False, sampler=SubsetSequentialSampler(validate_indices))
 
         key_val = {"index":[], "label":[], "pred":[], "pred_val":[]}
 
@@ -191,21 +191,23 @@ class EnginePointnet(Engine):
 
         dump_interval = self.config.validate_dump_interval
         dump_index = 0
+        num_batches = 0
 
         with torch.no_grad():
             for iteration, batch in enumerate(data_iter):
                 data, label = batch
+                num_batches += 1
 
-                stdout.write("Iteration : {}, Progress {} \n".format(iteration, iteration/len(data_iter)))
+                #stdout.write("Iteration : {}, Progress {} \n".format(iteration, iteration/len(data_iter)))
                 pred=self.forward(data, mode="validation")
-
-                acc = pred.argmax(1).eq(label).sum().item()
-                loss = self.criterion(pred, label.view(-1)) * label.shape[0]
-                avg_acc += acc
+                predlabel = torch.argmax(pred, dim=1)
+                acc = np.mean(predlabel.cpu().numpy() == label.view(-1).cpu().numpy())
+                loss = self.criterion(pred, label.view(-1)).item()
                 avg_loss += loss
+                avg_acc += acc
 
                 # Log/Report
-                self.log.record(["Iteration", "loss", "acc"], [iteration, loss, acc/label.shape[0]])
+                self.log.record(["Iteration", "loss", "acc"], [iteration, loss, acc])
                 self.log.write()
 
                 # Log/Report
@@ -217,7 +219,7 @@ class EnginePointnet(Engine):
 
                 # Check if iteration is valid_dump_interval
                 if len(key_val["index"]) >= dump_interval:
-                    print("dumping")
+                    #print("dumping")
                     name = os.path.join(output_path, "{}.npz".format(dump_index))
                     np.savez(name, **key_val)
 
@@ -229,8 +231,8 @@ class EnginePointnet(Engine):
         name = os.path.join(output_path, "{}.npz".format(dump_index))
         np.savez(name, **key_val)
 
-        avg_acc/=len(validate_indices)
-        avg_loss/=len(validate_indices)
+        avg_acc/=num_batches
+        avg_loss/=num_batches
 
         stdout.write("Overall acc : {}, Overall loss : {}\n".format(avg_acc, avg_loss))
 
