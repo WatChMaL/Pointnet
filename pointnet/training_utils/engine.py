@@ -8,7 +8,7 @@ from torch import device, load, save
 from torch.nn import DataParallel
 from torch.cuda import is_available
 
-from io_util.data_handler_kn_all_features import get_loaders
+from io_util.data_handler_kn_with_time import get_loaders
 from training_utils.logger import CSVData
 
 class Engine(ABC):
